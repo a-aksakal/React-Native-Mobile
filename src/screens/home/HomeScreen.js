@@ -40,7 +40,7 @@ const HomeScreen = () => {
         </View>
 
         <View style={styles.box2_box_element_detail}>
-          <Text style={styles.box2_detail_name}>{item.title.slice(0, 30)}</Text>
+          <Text style={styles.box2_detail_name}>{item.title}</Text>
           <View style={styles.box2_box_element_detail_star}>
             <AntDesign name="star"></AntDesign>
             <AntDesign name="star"></AntDesign>
@@ -50,12 +50,14 @@ const HomeScreen = () => {
           </View>
         </View>
         <View style={styles.box2_box_element_price}>
-          <Text style={styles.box2_price_name}>
-            {item.description.slice(0, 40)}
-          </Text>
-          <Text style={styles.box2_price_number}>{item.price}TL</Text>
+          <Text style={styles.box2_price_name}>{item.description}</Text>
         </View>
         <View style={styles.box2_box_element_button}>
+          <Text style={styles.box2_price_number}>
+            {item.price}
+            <Text style={{ fontSize: 14, fontWeight: "bold" }}> TL</Text>
+          </Text>
+
           <Pressable style={styles.cart_pressable}>
             <Text style={styles.cart_pressable_text}>Sepete Ekle</Text>
           </Pressable>
@@ -65,7 +67,7 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
-    fetch("https://fakestoreapi.com/products?limit=5")
+    fetch("https://fakestoreapi.com/products?limit=10")
       .then((res) => res.json())
       .then((data) => setProducts(data));
   });
@@ -110,6 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#EBECF4",
   },
   flatlist: {
+    flex: 1,
     backgroundColor: "#EBECF4",
   },
   header: {
@@ -159,21 +162,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     marginRight: 20,
     borderRadius: 15,
+    width: 300,
   },
   box2_box_element_image: {
     flex: 5,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 10,
   },
   box2_box_element_button: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     paddingRight: 10,
+    paddingLeft: 10,
+    alignItems: "center",
   },
   box2_box_element_detail: {
     flex: 2,
     justifyContent: "flex-start",
     paddingLeft: 10,
-    flexShrink: 1,
   },
   box2_box_element_detail_star: {
     flex: 1,
@@ -185,21 +193,25 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     paddingBottom: 10,
     paddingTop: 10,
+    paddingRight: 10,
+    textAlign: "justify",
   },
   box2_price_name: {
     fontSize: 12,
     fontWeight: "600",
     paddingBottom: 10,
+    textAlign: "justify",
   },
   box2_price_number: {
     color: "#D1D1DF",
     fontWeight: "bold",
-    fontSize: 20,
+    fontSize: 30,
   },
   box2_box_element_price: {
     flex: 2,
     justifyContent: "flex-start",
     paddingLeft: 10,
+    paddingRight: 10,
   },
   box2_box_image: {
     flex: 1,
