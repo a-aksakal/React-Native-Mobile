@@ -67,7 +67,7 @@ const HomeScreen = () => {
         <View style={styles.box2_box_element_button}>
           <View style={styles.box2_box_element_pricebox}>
             <Text style={styles.box2_price_number}>
-              {item.price}
+              {item.price.toFixed(2)}
               <Text style={{ fontSize: 14, fontWeight: "bold" }}> TL</Text>
             </Text>
           </View>

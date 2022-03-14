@@ -5,10 +5,10 @@ import {
   Image,
   TextInput,
   FlatList,
+  Pressable,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
 import {
   MaterialCommunityIcons,
   Ionicons,
@@ -20,59 +20,88 @@ import NumericInput from "react-native-numeric-input";
 import CartContext from "../../store/CartContext";
 const CartScreen = () => {
   const { cart, setCart } = useContext(CartContext);
-  const renderItem = ({ item }) => {
-    return (
-      <View style={styles.cartbox}>
-        <View style={styles.cartbox_photo}>
-          <Image
-            style={styles.cartbox_photo_photo}
-            source={{
-              uri: item.image,
-            }}
-          ></Image>
-        </View>
-        <View style={styles.cartbox_nameandprice}>
-          <View style={styles.cartbox_nameandprice_details}>
-            <Text style={styles.cartbox_nameandprice_details_name}>
-              {item.title}
-            </Text>
-            <View
-              style={{
-                flex: 1,
-                alignContent: "flex-end",
-                alignItems: "flex-end",
-              }}
-            >
-              <Ionicons name="trash-outline" size={20} color="red"></Ionicons>
-            </View>
-          </View>
-          <View style={styles.cartbox_nameandprice_details_total}>
-            <Text style={{ fontSize: 25, fontWeight: "600" }}>
-              {item.price}
-              <Text style={{ fontSize: 12 }}>TL/adet</Text>
-            </Text>
-          </View>
+  var total = 0;
+  const [totalPrice, setTotalPrice] = useState(0);
+  const DeleteItem = (item) => {
+    if (cart.length == 1) {
+      setTotalPrice(0);
+    }
+    var cartitem = cart.find((p) => p.id == item.id);
+    var indexitem = cart.indexOf(cartitem);
+    cart.splice(indexitem, 1);
+    setCart([...cart]);
+  };
 
-          <View style={styles.cartbox_nameandprice_price}>
-            {/* <TextInput
+  const ChangeQuantity = (item, value) => {
+    var cartitem = cart.find((p) => p.id == item.id);
+    cartitem.quantity = value;
+    setCart([...cart]);
+  };
+  const renderItem = ({ item }) => {
+    total = total + item.quantity * item.price;
+    setTotalPrice(total.toFixed(2));
+    return (
+      <>
+        <View style={styles.cartbox}>
+          <View style={styles.cartbox_photo}>
+            <Image
+              style={styles.cartbox_photo_photo}
+              source={{
+                uri: item.image,
+              }}
+            ></Image>
+          </View>
+          <View style={styles.cartbox_nameandprice}>
+            <View style={styles.cartbox_nameandprice_details}>
+              <Text style={styles.cartbox_nameandprice_details_name}>
+                {item.title}
+              </Text>
+              <View
+                style={{
+                  flex: 1,
+                  alignContent: "flex-end",
+                  alignItems: "flex-end",
+                }}
+              >
+                <Pressable onPress={() => DeleteItem(item)}>
+                  <Ionicons
+                    name="trash-outline"
+                    size={20}
+                    color="red"
+                  ></Ionicons>
+                </Pressable>
+              </View>
+            </View>
+            <View style={styles.cartbox_nameandprice_details_total}>
+              <Text style={{ fontSize: 25, fontWeight: "600" }}>
+                {item.price}
+                <Text style={{ fontSize: 12 }}>TL/adet</Text>
+              </Text>
+            </View>
+
+            <View style={styles.cartbox_nameandprice_price}>
+              {/* <TextInput
               keyboardType="numeric"
               numeric
               style={styles.cartbox_nameandprice_price_quantity}
               defaultValue={item.quantity}
             ></TextInput> */}
-            <View style={styles.cartbox_nameandprice_price_num}>
-              <NumericInput
-                totalWidth={100}
-                totalHeight={60}
-                rounded
-                iconStyle={{ color: "white" }}
-                rightButtonBackgroundColor="green"
-                leftButtonBackgroundColor="#B22222"
-                valueType="integer"
-                minValue={1}
-              ></NumericInput>
-            </View>
-            {/* <View style={styles.cartbox_nameandprice_price_buttons}>
+              <View style={styles.cartbox_nameandprice_price_num}>
+                <NumericInput
+                  totalWidth={100}
+                  totalHeight={60}
+                  rounded
+                  iconStyle={{ color: "white" }}
+                  rightButtonBackgroundColor="green"
+                  leftButtonBackgroundColor="#B22222"
+                  valueType="integer"
+                  minValue={1}
+                  initValue={item.quantity}
+                  value={item.quantity}
+                  onChange={(value) => ChangeQuantity(item, value)}
+                ></NumericInput>
+              </View>
+              {/* <View style={styles.cartbox_nameandprice_price_buttons}>
               <Pressable>
                 <Ionicons
                   name="arrow-up-circle"
@@ -89,22 +118,23 @@ const CartScreen = () => {
                 ></Ionicons>
               </Pressable>
             </View> */}
-            {/* TOTAL PRICE STYLE*/}
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
-              <Text
-                style={{
-                  fontSize: 28,
-                  fontWeight: "bold",
-                  color: "#32CD32",
-                }}
-              >
-                {item.price * item.quantity}
-                <Text style={{ fontSize: 12 }}>TL</Text>
-              </Text>
+              {/* TOTAL PRICE STYLE*/}
+              <View style={{ flex: 1, alignItems: "flex-end" }}>
+                <Text
+                  style={{
+                    fontSize: 28,
+                    fontWeight: "bold",
+                    color: "#32CD32",
+                  }}
+                >
+                  {(item.price * item.quantity).toFixed(2)}
+                  <Text style={{ fontSize: 12 }}>TL</Text>
+                </Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
+      </>
     );
   };
   return (
@@ -114,6 +144,23 @@ const CartScreen = () => {
         data={cart}
         renderItem={renderItem}
       ></FlatList>
+      <View style={styles.totalprice}>
+        <View style={styles.totalprice_price}>
+          <Text style={styles.totalprice_price_name}>Toplam Tutar </Text>
+          <Text style={styles.totalprice_price_number}>
+            {totalPrice}
+            <Text style={{ fontSize: 12 }}>TL</Text>
+          </Text>
+        </View>
+        <View style={styles.totalprice_button}>
+          <Pressable style={styles.totalprice_button_button}>
+            <MaterialCommunityIcons
+              name="credit-card-check-outline"
+              size={20}
+            ></MaterialCommunityIcons>
+          </Pressable>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -126,6 +173,8 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     backgroundColor: "#EBECF4",
+    justifyContent: "space-between",
+    alignContent: "space-between",
   },
   flatlist: {
     flex: 1,
@@ -205,6 +254,47 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     paddingLeft: 10,
+  },
+  totalprice: {
+    flex: 0.1,
+    flexDirection: "column",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  totalprice_price: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignContent: "space-between",
+    flexWrap: "wrap",
+  },
+  totalprice_price_name: {
+    flex: 2,
+    fontSize: 26,
+    fontWeight: "bold",
+  },
+  totalprice_price_number: {
+    flex: 1,
+    fontWeight: "bold",
+    fontSize: 26,
+    color: "#32CD32",
+  },
+  totalprice_button: {
+    flex: 1,
+    alignItems: "flex-end",
+    alignContent: "flex-end",
+    flexWrap: "wrap",
+    paddingTop: 10,
+    paddingRight: 20,
+  },
+  totalprice_button_button: {
+    flex: 1,
+    backgroundColor: "#FFA07A",
+    width: 50,
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
   },
 });
 
