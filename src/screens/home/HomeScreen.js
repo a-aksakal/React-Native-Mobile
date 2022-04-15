@@ -21,10 +21,12 @@ import {
 import ImageZoom from "react-native-image-pan-zoom";
 import { transform } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
 import CartContext, { CartProvider } from "../../store/CartContext";
+import { connect } from "react-redux";
+import { addFav } from "../../store/actions/fav.action";
 
 //https://www.korezin.com/wp-content/uploads/2020/02/download-36.jpg
 
-const HomeScreen = () => {
+const HomeScreen = (props) => {
   const [products, setProducts] = useState([]);
   const { cart, setCart } = useContext(CartContext);
 
@@ -78,6 +80,7 @@ const HomeScreen = () => {
               <MaterialCommunityIcons
                 name="heart-outline"
                 size={40}
+                onPress={() => addToFav(item)}
               ></MaterialCommunityIcons>
             </Pressable>
             <Pressable
@@ -101,6 +104,9 @@ const HomeScreen = () => {
       .then((res) => res.json())
       .then((data) => setProducts(data));
   }, []);
+  const addToFav = (item) => {
+    props.onCreate(item);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{ flexGrow: 1, height: "100%" }}>
@@ -132,6 +138,20 @@ const HomeScreen = () => {
       </ScrollView>
     </SafeAreaView>
   );
+};
+
+const mapStateToProps = (state) => {
+  return {
+    favorite: state,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onCreate: (data) => {
+      dispatch(addFav(data));
+    },
+  };
 };
 
 const styles = StyleSheet.create({
@@ -281,4 +301,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
